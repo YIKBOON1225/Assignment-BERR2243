@@ -1,0 +1,23 @@
+{
+  "name": "assignment-berr2243",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/YIKBOON1225/Assignment-BERR2243#readme",
+  "bugs": {
+    "url": "https://github.com/YIKBOON1225/Assignment-BERR2243/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YIKBOON1225/Assignment-BERR2243.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+     "start": "node index.js" 
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
