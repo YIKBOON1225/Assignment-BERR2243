@@ -1,0 +1,30 @@
+// server.js
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const connectDB = require('./config/db.js');
+
+// 1. Load env vars
+dotenv.config();
+
+// 2. Connect to database
+connectDB();
+
+// 3. Initialize Express
+const app = express();
+
+// 4. Middleware
+app.use(express.json()); // Allows server to accept JSON data in the body
+app.use(cors());
+
+// 5. Basic Route (Test if server is running)
+app.get('/', (req, res) => {
+  res.send('MyTaxi API is running...');
+});
+
+// 6. Start Server
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
