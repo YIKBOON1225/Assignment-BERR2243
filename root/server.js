@@ -6,6 +6,8 @@ const connectDB = require('../config/db.js');
 const userRoutes = require('../routes/userRoutes.js');
 const driverRoutes = require('../routes/driverRoutes');
 const adminRoutes = require('../routes/adminRoutes');
+console.log('Starting MyTaxi backend...');
+console.log('About to start listening...');
 
 // 1. Load env vars
 dotenv.config();
