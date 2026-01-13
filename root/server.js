@@ -2,7 +2,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./config/db.js');
+const connectDB = require('../config/db.js');
+const userRoutes = require('../routes/userRoutes.js');
 
 // 1. Load env vars
 dotenv.config();
@@ -16,6 +17,8 @@ const app = express();
 // 4. Middleware
 app.use(express.json()); // Allows server to accept JSON data in the body
 app.use(cors());
+app.use(express.json());
+app.use('/api/users', userRoutes);
 
 // 5. Basic Route (Test if server is running)
 app.get('/', (req, res) => {
