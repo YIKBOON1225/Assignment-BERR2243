@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('../config/db.js');
 const userRoutes = require('../routes/userRoutes.js');
-const driverRoutes = require('./routes/driverRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const driverRoutes = require('../routes/driverRoutes');
+const adminRoutes = require('../routes/adminRoutes');
 
 // 1. Load env vars
 dotenv.config();
@@ -21,7 +21,6 @@ app.use(express.json()); // Allows server to accept JSON data in the body
 app.use(cors());
 app.use(express.json());
 app.use('/api/users', userRoutes);
-app.use('/api/auth', require('./routes/authRoutes')); // (From previous step)
 app.use('/api/driver', driverRoutes);
 app.use('/api/admin', adminRoutes);
 
