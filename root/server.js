@@ -7,6 +7,8 @@ const userRoutes = require('../routes/userRoutes.js');
 const driverRoutes = require('../routes/driverRoutes');
 const adminRoutes = require('../routes/adminRoutes');
 const rideRoutes = require('../routes/rideRoutes.js');
+const authRoutes = require('../routes/authRoutes.js');
+
 console.log('Starting MyTaxi backend...');
 console.log('About to start listening...');
 
@@ -27,6 +29,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/driver', driverRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/rides', rideRoutes);
+app.use('/api/auth', authRoutes);
 
 // 5. Basic Route (Test if server is running)
 app.get('/', (req, res) => {
