@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const Ride = require('../models/Ride'); // Make sure you have the Ride model created!
+const Ride = require('../models/Ride'); 
 
 // @desc    Get all users (Manage Users)
 // @route   GET /api/admin/users
