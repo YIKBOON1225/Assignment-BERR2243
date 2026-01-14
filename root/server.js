@@ -25,6 +25,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/driver', driverRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/rides', rideRoutes);
 
 // 5. Basic Route (Test if server is running)
 app.get('/', (req, res) => {
