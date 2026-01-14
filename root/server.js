@@ -4,12 +4,12 @@ dotenv.config();
 const cors = require('cors');
 
 const express = require('express');
-const connectDB = require('../config/db.js');
-const userRoutes = require('../routes/userRoutes.js');
-const driverRoutes = require('../routes/driverRoutes');
-const adminRoutes = require('../routes/adminRoutes');
-const rideRoutes = require('../routes/rideRoutes.js');
-const authRoutes = require('../routes/authRoutes.js');
+const connectDB = require('./config/db.js');
+const userRoutes = require('./routes/userRoutes.js');
+const driverRoutes = require('./routes/driverRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const rideRoutes = require('./routes/rideRoutes.js');
+const authRoutes = require('./routes/authRoutes.js');
 
 console.log('Starting MyTaxi backend...');
 console.log('About to start listening...');

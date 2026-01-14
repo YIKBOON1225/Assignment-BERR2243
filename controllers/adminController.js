@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const Ride = require('../models/Ride'); 
-
 // @desc    Get all users (Manage Users)
 // @route   GET /api/admin/users
 exports.getAllUsers = async (req, res) => {
@@ -11,7 +10,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // @desc    Delete a user (Manage Users)
 // @route   DELETE /api/admin/users/:id
 exports.deleteUser = async (req, res) => {
@@ -22,7 +20,6 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // @desc    View all rides (Monitoring)
 // @route   GET /api/admin/rides
 exports.getAllRides = async (req, res) => {

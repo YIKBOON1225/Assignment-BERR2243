@@ -1,5 +1,4 @@
 const User = require('../models/User');
-
 // @desc    Get Passenger info (by ID)
 // @route   GET /api/driver/passenger/:id
 exports.getPassengerInfo = async (req, res) => {
@@ -13,7 +12,6 @@ exports.getPassengerInfo = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // @desc    Update Driver Profile
 // @route   PUT /api/driver/profile/:id
 exports.updateDriverProfile = async (req, res) => {
@@ -29,7 +27,6 @@ exports.updateDriverProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // @desc    Delete Driver Account
 // @route   DELETE /api/driver/account/:id
 exports.deleteDriverAccount = async (req, res) => {
