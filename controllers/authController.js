@@ -13,3 +13,10 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.logout = async (req, res) => {
+    // Since we use JWT on the client side, we just send a success message.
+    res.status(200).json({
+        success: true,
+        message: "Logged out successfully. Please delete the token from client storage."
+    });
+};
