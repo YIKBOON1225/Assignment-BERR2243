@@ -2,7 +2,7 @@ const Ride = require('../models/Ride');
 
 // Passenger: Request Ride
 exports.requestRide = async (req, res) => {
-    const { pickupLocation, destination } = req.body;
+    const { pickupLocation, destination, fare } = req.body;
     const ride = await Ride.create({ passenger: req.user.id, pickupLocation, destination, fare: fare || 10 });
     res.status(201).json(ride);
 };
