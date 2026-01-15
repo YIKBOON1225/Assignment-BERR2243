@@ -66,3 +66,29 @@ exports.cancelRide = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Get History
+exports.getMyHistory = async (req, res) => {
+    try {
+        let query;
+        if (req.user.role === 'Passenger') {
+            query = { passenger: req.user.id };
+        } else if (req.user.role === 'Driver') {
+            query = { driver: req.user.id };
+        }
+        const rides = await Ride.find(query).sort({ createdAt: -1 });
+        res.status(200).json(rides);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get Available Rides
+exports.getAvailableRides = async (req, res) => {
+    try {
+        const rides = await Ride.find({ status: 'Requested' }).sort({ createdAt: -1 });
+        res.status(200).json(rides);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
