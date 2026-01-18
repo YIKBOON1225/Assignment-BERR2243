@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; display: flex; justify-content: center; padding-top: 50px; }
+        .container { background: white; padding: 30px; border-radius: 10px; width: 800px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h1 { text-align: center; color: #333; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .hidden { display: none; }
+        .grid { display: flex; gap: 20px; }
+        .col { flex: 1; background: #f4f4f4; padding: 15px; border-radius: 8px; }
+        .ride-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ddd; }
+        .action-btn { width: auto; padding: 5px 10px; font-size: 14px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚖 Driver Portal</h1>
+
+    <div id="login-section">
+        <input type="email" id="email" placeholder="Driver Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="msg" style="color:red; text-align:center;"></p>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+        <div class="grid">
+            <div class="col">
+                <h3>📢 Available Jobs</h3>
+                <div id="available-list">Loading...</div>
+            </div>
+
+            <div class="col">
+                <h3>✅ My Active Rides</h3>
+                <div id="my-list">Loading...</div>
+            </div>
+        </div>
+        <button onclick="logout()" style="background:#dc3545; margin-top:20px;">Logout</button>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://assignmentberr2243-fuabd3feauevhxad.southeastasia-01.azurewebsites.net/api";
+    let token = localStorage.getItem('driver_token');
+
+    if(token) showDashboard();
+
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if(res.ok && data.role === 'Driver') {
+                token = data.token;
+                localStorage.setItem('driver_token', token);
+                showDashboard();
+            } else {
+                document.getElementById('msg').innerText = "Login Failed. Are you a Driver?";
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function showDashboard() {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        refreshData();
+        setInterval(refreshData, 5000); // Auto-refresh every 5 seconds
+    }
+
+    async function refreshData() {
+        // 1. Get Available Rides
+        const resAvail = await fetch(`${API_URL}/rides/available`, { headers: { 'Authorization': `Bearer ${token}` }});
+        const availRides = await resAvail.json();
+        
+        const availDiv = document.getElementById('available-list');
+        availDiv.innerHTML = "";
+        availRides.forEach(ride => {
+            availDiv.innerHTML += `
+                <div class="ride-card">
+                    <b>${ride.pickupLocation} ➝ ${ride.destination}</b><br>
+                    Fare: RM${ride.fare}<br>
+                    <button class="action-btn" onclick="acceptRide('${ride._id}')" style="background:#007bff;">Accept Job</button>
+                </div>`;
+        });
+
+        // 2. Get My History (Filter for 'Accepted')
+        const resMy = await fetch(`${API_URL}/rides/my-history`, { headers: { 'Authorization': `Bearer ${token}` }});
+        const myRides = await resMy.json();
+        
+        const myDiv = document.getElementById('my-list');
+        myDiv.innerHTML = "";
+        const activeRides = myRides.filter(r => r.status === 'Accepted');
+        
+        if(activeRides.length === 0) myDiv.innerHTML = "<p>No active rides.</p>";
+
+        activeRides.forEach(ride => {
+            myDiv.innerHTML += `
+                <div class="ride-card" style="border-left:4px solid green;">
+                    <b>${ride.destination}</b><br>
+                    Passenger ID: ${ride.passenger}<br>
+                    <button class="action-btn" onclick="completeRide('${ride._id}')" style="background:green;">Complete Ride</button>
+                </div>`;
+        });
+    }
+
+    async function acceptRide(id) {
+        await fetch(`${API_URL}/rides/accept/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }});
+        refreshData();
+    }
+
+    async function completeRide(id) {
+        await fetch(`${API_URL}/rides/complete/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }});
+        refreshData();
+    }
+
+    function logout() { localStorage.removeItem('driver_token'); location.reload(); }
+</script>
+</body>
+</html>

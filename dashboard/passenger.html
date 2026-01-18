@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Passenger Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; display: flex; justify-content: center; padding-top: 50px; }
+        .container { background: white; padding: 30px; border-radius: 10px; width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+        .ride-card { background: #f8f9fa; border-left: 5px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 4px; position: relative; }
+        
+        /* Status Colors */
+        .status-Requested { border-color: orange; }
+        .status-Accepted { border-color: blue; }
+        .status-Completed { border-color: green; }
+        .status-Cancelled { border-color: red; background-color: #fff0f0; }
+
+        .cancel-btn { background-color: #dc3545; width: auto; padding: 5px 10px; font-size: 12px; position: absolute; right: 15px; top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🙋‍♂️ Passenger Portal</h1>
+
+    <div id="login-section">
+        <input type="email" id="email" placeholder="Passenger Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="msg" style="color:red; text-align:center;"></p>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+        <h3>📍 Request a New Ride</h3>
+        <input type="text" id="pickup" placeholder="Pickup Location (e.g., Library)">
+        <input type="text" id="dest" placeholder="Destination (e.g., Mall)">
+        <input type="number" id="fare" placeholder="Offer Fare (RM)">
+        <button onclick="requestRide()">Request Ride</button>
+
+        <h3>📜 My Ride History</h3>
+        <div id="ride-list">Loading...</div>
+        
+        <button onclick="logout()" style="background:#dc3545; margin-top:20px;">Logout</button>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://assignmentberr2243-fuabd3feauevhxad.southeastasia-01.azurewebsites.net/api";
+    let token = localStorage.getItem('passenger_token');
+
+    if(token) showDashboard();
+
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if(res.ok && data.role === 'Passenger') {
+                token = data.token;
+                localStorage.setItem('passenger_token', token);
+                showDashboard();
+            } else {
+                document.getElementById('msg').innerText = "Login Failed. Are you a Passenger?";
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function showDashboard() {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        loadHistory();
+    }
+
+    async function requestRide() {
+        const pickupLocation = document.getElementById('pickup').value;
+        const destination = document.getElementById('dest').value;
+        const fare = document.getElementById('fare').value;
+
+        if(!pickupLocation || !destination || !fare) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        await fetch(`${API_URL}/rides/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ pickupLocation, destination, fare })
+        });
+        document.getElementById('pickup').value = '';
+        document.getElementById('dest').value = '';
+        document.getElementById('fare').value = '';
+        
+        loadHistory(); // Refresh list
+    }
+
+    // 🔴 NEW: Cancel Ride Function
+    async function cancelRide(id) {
+        if(!confirm("Are you sure you want to cancel this ride?")) return;
+
+        const res = await fetch(`${API_URL}/rides/cancel/${id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if(res.ok) {
+            loadHistory(); // Refresh to see status change
+        } else {
+            alert("Failed to cancel ride.");
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const res = await fetch(`${API_URL}/rides/my-history`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const rides = await res.json();
+            const list = document.getElementById('ride-list');
+            list.innerHTML = "";
+            
+            rides.forEach(ride => {
+                // Only show Cancel button if status is Requested or Accepted
+                let cancelButton = "";
+                if (ride.status === "Requested" || ride.status === "Accepted") {
+                    cancelButton = `<button class="cancel-btn" onclick="cancelRide('${ride._id}')">Cancel</button>`;
+                }
+
+                list.innerHTML += `
+                    <div class="ride-card status-${ride.status}">
+                        <strong>To:</strong> ${ride.destination} <br>
+                        <strong>Fare:</strong> RM${ride.fare} <br>
+                        <strong>Status:</strong> ${ride.status}
+                        ${cancelButton}
+                    </div>`;
+            });
+        } catch (e) {
+            console.error("Error loading history", e);
+        }
+    }
+
+    function logout() { localStorage.removeItem('passenger_token'); location.reload(); }
+</script>
+</body>
+</html>
